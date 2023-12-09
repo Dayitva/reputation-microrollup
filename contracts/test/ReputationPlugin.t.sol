@@ -102,4 +102,15 @@ contract ReputationPluginTest is Test {
         // token.addPlugin(address(plugin));
         print();
     }
+
+    function testVouch6() public {
+        print();
+        token.mint(user1, 500);
+        token.mint(user2, 800);
+        vm.prank(user1);
+        vm.expectRevert("Choose lower amount. Score Cap Reached!");
+        plugin.vouch(user2, 400);
+        // token.addPlugin(address(plugin));
+        print();
+    }
 }

@@ -13,8 +13,6 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     error TransferDisabled();
 
     mapping(address => mapping(address => uint256)) public vouched;
-    uint256 vouchesSent;
-    uint256 vouchesReceived;
 
     constructor(string memory name_, string memory symbol_, IERC20Plugins token_)
         ERC20(name_, symbol_) Plugin(token_)
@@ -23,8 +21,12 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     function vouch(address vouchee, uint256 amount) public virtual {
         require(vouchee != msg.sender, "Cannot vouch for yourself!");
 
-        uint256 balance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
-        if (balance >= amount) {
+        uint256 senderBalance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
+        uint256 receiverBalance = IERC20Plugins(token).pluginBalanceOf(address(this), vouchee);
+
+        require(receiverBalance + amount <= 1000, "Choose lower amount. Score Cap Reached!");
+
+        if (senderBalance >= amount) {
             _updateBalances(msg.sender, vouchee, amount);
         }
 
@@ -35,6 +37,9 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     function vouchFrom(address fromVouchee, address toVouchee, uint256 amount) public virtual {
         require(vouched[msg.sender][fromVouchee] >= amount, "Not enough vouching power!");
         require(toVouchee != msg.sender, "Cannot vouch for yourself!");
+
+        uint256 receiverBalance = IERC20Plugins(token).pluginBalanceOf(address(this), toVouchee);
+        require(receiverBalance + amount <= 1000, "Choose lower amount. Score Cap Reached!");
         
         vouched[msg.sender][fromVouchee] -= amount;
         vouched[msg.sender][toVouchee] += amount;
