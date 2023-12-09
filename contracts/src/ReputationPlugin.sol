@@ -35,7 +35,7 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     }
 
     function vouchFrom(address fromVouchee, address toVouchee, uint256 amount) public virtual {
-        require(vouched[msg.sender][fromVouchee] >= amount, "Not enough vouching power");
+        require(vouched[msg.sender][fromVouchee] >= amount, "Not enough vouching power!");
         require(toVouchee != msg.sender, "Cannot vouch for yourself!");
         
         vouched[msg.sender][fromVouchee] -= amount;
@@ -64,17 +64,17 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
         );
     }
 
-    function _updateBalances(address /* from */, address /* to */, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual {
-        if (fromDelegatee != toDelegatee && amount > 0) {
-            if (fromDelegatee == address(0)) {
-                console.log("Minting %d to %s", amount, toDelegatee);
-                _mint(toDelegatee, amount);
-            } else if (toDelegatee == address(0)) {
-                console.log("Burning %d from %s", amount, fromDelegatee);
-                _burn(fromDelegatee, amount);
+    function _updateBalances(address /* from */, address /* to */, address fromVouchee, address toVouchee, uint256 amount) internal virtual {
+        if (fromVouchee != toVouchee && amount > 0) {
+            if (fromVouchee == address(0)) {
+                console.log("Minting %d to %s", amount, toVouchee);
+                _mint(toVouchee, amount);
+            } else if (toVouchee == address(0)) {
+                console.log("Burning %d from %s", amount, fromVouchee);
+                _burn(fromVouchee, amount);
             } else {
-                console.log("Transferring %d from %s to %s", amount, fromDelegatee, toDelegatee);
-                _transfer(fromDelegatee, toDelegatee, amount);
+                console.log("Transferring %d from %s to %s", amount, fromVouchee, toVouchee);
+                _transfer(fromVouchee, toVouchee, amount);
             }
         }
     }
