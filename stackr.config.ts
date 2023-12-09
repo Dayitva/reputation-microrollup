@@ -20,7 +20,7 @@ const stackrConfig: StackrConfig = {
   operator: {
     accounts: [
       {
-        privateKey: "0xbf316464e169d0b013243acc7abca4e02f4c6b8b6170086041af16c6e6d580a7",
+        privateKey: process.env.PRIVATE_KEY!,
         purpose: KeyPurpose.BATCH,
         scheme: SignatureScheme.ECDSA,
       },

@@ -1,4 +1,4 @@
-import { ActionEvents, ActionSchema, ConfirmationEvents, FIFOStrategy, MicroRollup } from "@stackr/stackr-js";
+import { ActionSchema, ConfirmationEvents, FIFOStrategy, MicroRollup } from "@stackr/stackr-js";
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 import { stackrConfig } from "../stackr.config";
