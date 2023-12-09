@@ -6,6 +6,7 @@ import { ReputationRollup, reputationSTF } from "./state";
 import { StateMachine } from "@stackr/stackr-js/execution";
 
 import * as genesisState from "../genesis-state.json";
+import { getReputation } from "./reputation";
 
 const reputationFsm = new StateMachine({
   state: new ReputationRollup(genesisState.state),
@@ -49,10 +50,6 @@ const rollup = async () => {
   return { state, actions };
 };
 
-const calcReputation = async (address: string) => {
-  return Math.floor(Math.random() * 100);
-};
-
 const app = express();
 app.use(bodyParser.json());
 const { actions, state } = await rollup();
@@ -70,7 +67,7 @@ app.post("/", async (req: Request, res: Response) => {
   }
 
   try {
-    const reputation = await calcReputation(req.body.msgSender);
+    const reputation = await getReputation(req.body.msgSender);
     console.log({ body: req.body, address: req.body.msgSender, reputation });
     req.body.payload.reputation = reputation;
     const newAction = schema.newAction(req.body);

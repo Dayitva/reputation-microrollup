@@ -23,6 +23,7 @@
     "src/**/*",
     "test/**/*",
     "deployment.json",
+    "test-response.json",
     "stackr.config.ts",
     "genesis-state.json"
   ]
