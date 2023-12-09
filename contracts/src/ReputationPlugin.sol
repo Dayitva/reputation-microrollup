@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import { IERC20, ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import { Plugin } from "@1inch/token-plugins/contracts/Plugin.sol";
 import { IERC20Plugins } from "@1inch/token-plugins/contracts/interfaces/IERC20Plugins.sol";
-import { IDelegationPlugin } from "./interfaces/IReputationPlugin.sol";
+import { IReputationPlugin } from "./IReputationPlugin.sol";
+import "forge-std/console.sol";
 
 contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     error ApproveDisabled();
@@ -23,6 +24,8 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
         require(vouchee != msg.sender, "Cannot vouch for yourself!");
 
         uint256 balance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
+        console.logUint(balance);
+        console.logUint(amount);
         if (balance >= amount) {
             _updateBalances(msg.sender, vouchee, amount);
         }
@@ -40,7 +43,6 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
         emit Vouched(msg.sender, toVouchee, amount);
         
         _updateBalances(fromVouchee, toVouchee, amount);
-
     }
 
     // function unvouch(address vouchee, uint amount) public virtual {
@@ -53,14 +55,28 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     // }
 
     function _updateBalances(address from, address to, uint256 amount) internal override {
-        if (from == msg.sender) {
-            vouchesSent -= amount;
-        } 
-        else if (to == msg.sender) {
-            vouchesReceived += amount;
+        _updateBalances(
+            from,
+            to,
+            from == address(0) ? address(0) : from,
+            to == address(0) ? address(0) : to,
+            amount
+        );
+    }
+
+    function _updateBalances(address /* from */, address /* to */, address fromDelegatee, address toDelegatee, uint256 amount) internal virtual {
+        if (fromDelegatee != toDelegatee && amount > 0) {
+            if (fromDelegatee == address(0)) {
+                console.log("Minting %d to %s", amount, toDelegatee);
+                _mint(toDelegatee, amount);
+            } else if (toDelegatee == address(0)) {
+                console.log("Burning %d from %s", amount, fromDelegatee);
+                _burn(fromDelegatee, amount);
+            } else {
+                console.log("Transferring %d from %s to %s", amount, fromDelegatee, toDelegatee);
+                _transfer(fromDelegatee, toDelegatee, amount);
+            }
         }
-        
-        _transfer(from, to, amount);
     }
 
     // ERC20 overrides
@@ -77,11 +93,11 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
         revert ApproveDisabled();
     }
 
-    function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
+    // function increaseAllowance(address /* spender */, uint256 /* addedValue */) public pure override returns (bool) {
+    //     revert ApproveDisabled();
+    // }
 
-    function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
-        revert ApproveDisabled();
-    }
+    // function decreaseAllowance(address /* spender */, uint256 /* subtractedValue */) public pure override returns (bool) {
+    //     revert ApproveDisabled();
+    // }
 }

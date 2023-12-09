@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
-// Simple token contract with plugin support
-contract Vouch is ERC20Plugins {
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { ERC20Plugins } from "@1inch/token-plugins/contracts/ERC20Plugins.sol";
+
+contract VouchToken is ERC20Plugins {
     constructor(string memory name, string memory symbol, uint256 maxPluginsPerAccount, uint256 pluginCallGasLimit)
         ERC20(name, symbol)
         ERC20Plugins(maxPluginsPerAccount, pluginCallGasLimit)
