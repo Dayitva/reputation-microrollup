@@ -18,26 +18,18 @@ contract ReputationPluginTest is Test {
 
     function setUp() public {
         token = new VouchToken("Vouch", "VCH", 1, 100000);
-        plugin = new ReputationPlugin("Vouch", "VCH", token);
-
-        // uint256 balance1 = IERC20Plugins(token).pluginBalanceOf(address(this), address(1));
-        // uint256 balance2 = IERC20Plugins(token).pluginBalanceOf(address(this), address(2));
-        // console.log(balance1);
-        // console.log(balance2);
+        plugin = new ReputationPlugin("Reputation", "RPT", token);
 
         token.mint(user1, 100);
 
-        vm.startPrank(user1);
+        vm.prank(user1);
         token.addPlugin(address(plugin));
-        vm.stopPrank();
 
-        vm.startPrank(user2);
+        vm.prank(user2);
         token.addPlugin(address(plugin));
-        vm.stopPrank();
 
-        vm.startPrank(user3);
+        vm.prank(user3);
         token.addPlugin(address(plugin));
-        vm.stopPrank();
     }
 
     function print() public view {
@@ -60,7 +52,7 @@ contract ReputationPluginTest is Test {
         console.log("====================================");
     }
 
-    function testVouch() public {
+    function testVouch1() public {
         print();
         vm.prank(user1);
         plugin.vouch(user2, 25);
@@ -77,11 +69,37 @@ contract ReputationPluginTest is Test {
         print();
     }
 
-    // function testVouch2() public {
-    //     print();
-    //     vm.prank(user1);
-    //     plugin.vouch(user3, 35);
-    //     print();
-    // }
-    
+    function testVouch2() public {
+        print();
+        vm.prank(user1);
+        token.transfer(user2, 90);
+        print();
+    }
+
+    function testVouch3() public {
+        print();
+        vm.prank(user1);
+        plugin.vouch(user2, 25);
+        print();
+        vm.prank(user1);
+        token.removePlugin(address(plugin));
+        print();
+    }
+
+    function testVouch4() public {
+        print();
+        vm.prank(user1);
+        token.mint(user1, 100);
+        vm.prank(user1);
+        // token.addPlugin(address(plugin));
+        print();
+    }
+
+    function testVouch5() public {
+        print();
+        vm.prank(user1);
+        token.burn(user1, 90);
+        // token.addPlugin(address(plugin));
+        print();
+    }
 }

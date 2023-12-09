@@ -24,8 +24,6 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
         require(vouchee != msg.sender, "Cannot vouch for yourself!");
 
         uint256 balance = IERC20Plugins(token).pluginBalanceOf(address(this), msg.sender);
-        console.logUint(balance);
-        console.logUint(amount);
         if (balance >= amount) {
             _updateBalances(msg.sender, vouchee, amount);
         }
@@ -50,7 +48,7 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
 
     //     vouched[msg.sender][vouchee] -= amount;
     //     emit UnVouched(msg.sender, vouchee, amount);
-        
+    
     //     _updateBalances(vouchee, msg.sender, amount);
     // }
 
@@ -65,13 +63,15 @@ contract ReputationPlugin is IReputationPlugin, Plugin, ERC20 {
     }
 
     function _updateBalances(address /* from */, address /* to */, address fromVouchee, address toVouchee, uint256 amount) internal virtual {
+        console.log("Updating balances");
         if (fromVouchee != toVouchee && amount > 0) {
             if (fromVouchee == address(0)) {
                 console.log("Minting %d to %s", amount, toVouchee);
                 _mint(toVouchee, amount);
             } else if (toVouchee == address(0)) {
                 console.log("Burning %d from %s", amount, fromVouchee);
-                _burn(fromVouchee, amount);
+                uint minOf = amount < balanceOf(fromVouchee) ? amount : balanceOf(fromVouchee);
+                _burn(fromVouchee, minOf);
             } else {
                 console.log("Transferring %d from %s to %s", amount, fromVouchee, toVouchee);
                 _transfer(fromVouchee, toVouchee, amount);
