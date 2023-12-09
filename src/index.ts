@@ -1,4 +1,4 @@
-import { ActionSchema, FIFOStrategy, MicroRollup } from "@stackr/stackr-js";
+import { ActionEvents, ActionSchema, ConfirmationEvents, FIFOStrategy, MicroRollup } from "@stackr/stackr-js";
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 import { stackrConfig } from "../stackr.config";
@@ -35,17 +35,9 @@ const rollup = async () => {
     useSyncer: { autorun: true },
   });
 
-  // events.action.onEvent(ActionEvents.SUBMIT_ACTION, (action) => {
-  //   console.log("action submitted", action);
-  // });
-
-  // events.batcher.onEvent(BatcherEvents.BATCH_ACTION, (batch) => {
-  //   console.log("action batched", batch);
-  // });
-
-  // events.builder.onEvent(BuilderEvents.ORDER_BATCH, (batch) => {
-  //   console.log("action batch ordered", batch);
-  // });
+  events.confirmation.onEvent(ConfirmationEvents.C2_CONFIRMATION, (data) => {
+    // TODO: Send the state root to the L1 contract
+  })
 
   return { state, actions };
 };
@@ -81,11 +73,3 @@ app.post("/", async (req: Request, res: Response) => {
 app.listen(3000, () => {
   console.log("listening on port 3000");
 });
-
-// actionEventsEmitter.on(ActionEvents.SUBMIT_ACTION, (data) => {
-//   console.log("submit_action - Event triggered : ", data.payload);
-// });
-
-// executorEventsEmitter.on(ExecutorEvents.EXECUTE_SINGLE, (data) => {
-//   console.log("execute_single - Event triggered : ", data);
-// });
