@@ -8,7 +8,7 @@ export type StateVariable = {
 
 type Account = {
   address: string;
-  balance: number;
+  reputation: number;
 };
 
 class MerkleTreeTransport {
@@ -24,7 +24,7 @@ class MerkleTreeTransport {
     const hashedLeaves = leaves.map((leaf: Account) => {
       return ethers.solidityPackedKeccak256(
         ["address", "uint"],
-        [leaf.address, leaf.balance]
+        [leaf.address, leaf.reputation]
       );
     });
     return new MerkleTree(hashedLeaves);
@@ -70,10 +70,10 @@ export const reputationSTF: STF<ReputationRollup, ReputationActionInput> = {
     if (index === -1) {
       newState.leaves.push({
         address: inputs.address,
-        balance: inputs.reputation,
+        reputation: inputs.reputation,
       });
     } else {
-      newState.leaves[index].balance += inputs.reputation;
+      newState.leaves[index].reputation += inputs.reputation;
     }
 
     console.log({ inputs, state: JSON.stringify(state.getState().leaves), leaves: newState.leaves });
