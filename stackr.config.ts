@@ -9,7 +9,7 @@ const stackrConfig: StackrConfig = {
     appInbox: deployment.app_inbox,
   },
   builder: {
-    batchSize: 16,
+    batchSize: 8,
     batchTime: 1000,
   },
   syncer: {
@@ -20,17 +20,16 @@ const stackrConfig: StackrConfig = {
   operator: {
     accounts: [
       {
-        privateKey:
-          "<APP-OPERATOR-KEY>",
+        privateKey: "0xbf316464e169d0b013243acc7abca4e02f4c6b8b6170086041af16c6e6d580a7",
         purpose: KeyPurpose.BATCH,
         scheme: SignatureScheme.ECDSA,
       },
     ],
   },
   domain: {
-    name: "Stackr MVP v0",
+    name: "Reputation Rollup",
     version: "1",
-    chainId: 1,
+    chainId: 69420,
     verifyingContract: deployment.app_inbox,
     salt: "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
   },
