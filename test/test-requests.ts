@@ -61,7 +61,7 @@ const viewRollupState = async () => {
 
 const run = async () => {
   await submitToRollup();
-  // await viewRollupState();
+  await viewRollupState();
 }
 
 // for(let i = 0; i < 10; i++) {

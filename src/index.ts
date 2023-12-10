@@ -5,7 +5,6 @@ import { stackrConfig } from "../stackr.config";
 import { ReputationRollup, reputationSTF } from "./state";
 import { StateMachine } from "@stackr/stackr-js/execution";
 import * as genesisState from "../genesis-state.json";
-import { getReputation } from "./reputation";
 
 import cors from 'cors';
 
