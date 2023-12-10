@@ -1,9 +1,20 @@
 import { ethers } from "ethers";
 import { stackrConfig } from "../stackr.config";
-import { actionInput } from "../src";
+import { ActionSchema } from "@stackr/stackr-js";
+
+const actionSchemaType = {
+  type: "String",
+  address: "Address",
+  reputation: "Uint",
+};
+
+const actionInput = new ActionSchema(
+  "calculate-reputation",
+  actionSchemaType
+);
 
 const submitToRollup = async () => {
-  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY!);
+  const wallet = new ethers.Wallet("0xbf316464e169d0b013243acc7abca4e02f4c6b8b6170086041af16c6e6d580a7");
 
   const data = {
     type: "calculate-reputation",
@@ -16,6 +27,8 @@ const submitToRollup = async () => {
     actionInput.EIP712TypedData.types,
     data
   );
+
+  console.log(actionInput.EIP712TypedData.types)
 
   const payload = JSON.stringify({
     msgSender: wallet.address,
@@ -51,6 +64,6 @@ const run = async () => {
   await viewRollupState();
 }
 
-for(let i = 0; i < 10; i++) {
+// for(let i = 0; i < 10; i++) {
   await run();
-}
+// } 

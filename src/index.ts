@@ -4,9 +4,9 @@ import express, { Request, Response } from "express";
 import { stackrConfig } from "../stackr.config";
 import { ReputationRollup, reputationSTF } from "./state";
 import { StateMachine } from "@stackr/stackr-js/execution";
-
 import * as genesisState from "../genesis-state.json";
-import { getReputation } from "./reputation";
+
+import cors from 'cors';
 
 const reputationFsm = new StateMachine({
   state: new ReputationRollup(genesisState.state),
@@ -16,7 +16,7 @@ const reputationFsm = new StateMachine({
 export const actionSchemaType = {
   type: "String",
   address: "Address",
-  reputation: "Number",
+  reputation: "Uint",
 };
 
 export const actionInput = new ActionSchema(
@@ -42,13 +42,24 @@ const rollup = async () => {
   return { state, actions };
 };
 
+
 const app = express();
 app.use(bodyParser.json());
+
+// Use CORS for all routes
+app.use(cors());
+
 const { actions, state } = await rollup();
 
 app.get("/", (req: Request, res: Response) => {
   res.send({ leaves: state.get().state.getState().leaves });
 });
+
+app.post("/getReputation", async (req: Request, res: Response) => {
+  // const reputation = await getReputation(req.body.address);
+  console.log(req.body)
+  res.status(201).send({ reputation: Math.floor(Math.random() * 1000) });
+})
 
 app.post("/", async (req: Request, res: Response) => {
   const schema = actions.getSchema("calculate-reputation");
@@ -59,9 +70,8 @@ app.post("/", async (req: Request, res: Response) => {
   }
 
   try {
-    const reputation = await getReputation(req.body.msgSender);
-    console.log({ body: req.body, address: req.body.msgSender, reputation });
-    req.body.payload.reputation = reputation;
+    console.log({ body: req.body, address: req.body.msgSender });
+    console.log(req.body)
     const newAction = schema.newAction(req.body);
     const ack = await actions.submit(newAction);
     res.status(201).send({ ack });
